@@ -1,2 +1,2 @@
 # trams
-Metrolink tram information for Greater Manchester using TfGM API data
+Greater Manchester Metrolink tram CLI using TfGM API data.
