@@ -4,9 +4,22 @@ import (
 	"time"
 )
 
+// Client is the main API for communicating with the trams backend cloud function.
+type Client struct {
+
+	// URL of the backend cloud function.
+	URL string
+
+	// Timeout in milliseconds for receiving result from backend
+	Timeout int
+}
+
+// Metrolinks is the JSON struct returned by the backend cloud function.
 type Metrolinks struct {
 	Value []Metrolink
 }
+
+// Metrolink provides information for a station location.
 type Metrolink struct {
 	Id              int
 	Line            string
