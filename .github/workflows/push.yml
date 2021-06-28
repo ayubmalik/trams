@@ -1,4 +1,4 @@
-name: trams-release-pipeline
+name: trams-release
 on: push
 jobs:
   test:
