@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var version = "dev"
+
 func main() {
 	app := &cli.App{
 		Usage:     "display Metrolink tram information using data from TfGM API",
@@ -23,10 +25,10 @@ func main() {
 				},
 			},
 			{
-				Name:  "clear",
-				Usage: "clear cached list of stations and temporary data",
+				Name:  "version",
+				Usage: "version of trams app.",
 				Action: func(c *cli.Context) error {
-					fmt.Println("TODO clear: ", c.Args().First())
+					fmt.Println("version: ", version)
 					return nil
 				},
 			},

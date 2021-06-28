@@ -1,7 +1,8 @@
 package trams
 
 import (
-	"fmt"
+	"encoding/json"
+	"net/http"
 	"time"
 )
 
@@ -19,9 +20,19 @@ type Client struct {
 
 // List retrieves information about the specified Metrolink stations.
 // If no station IDs is empty retrives all stations.
-func (c Client) List(ids ...StationID) []Metrolink {
-	fmt.Printf("List() called %v\n", ids)
-	return nil
+func (c Client) List(ids ...StationID) ([]Metrolink, error) {
+	resp, err := http.Get(c.url)
+	if err != nil {
+		return nil, err
+	}
+
+	var m Metrolinks
+	err = json.NewDecoder(resp.Body).Decode(&m)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.Value, err
 }
 
 // StationID represent a station ID in short (TLARef) form or
