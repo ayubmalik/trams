@@ -28,7 +28,7 @@ func main() {
 				Name:  "version",
 				Usage: "version of trams app.",
 				Action: func(c *cli.Context) error {
-					fmt.Println("version: ", version)
+					fmt.Println(version)
 					return nil
 				},
 			},
