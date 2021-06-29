@@ -3,6 +3,7 @@ package trams
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -13,6 +14,7 @@ func NewClient(url string, timeout int) Client {
 }
 
 // Client is the main API for communicating with the trams backend cloud function.
+// TODO: use timeout
 type Client struct {
 	url     string
 	timeout int
@@ -20,8 +22,9 @@ type Client struct {
 
 // List retrieves information about the specified Metrolink stations.
 // If no station IDs is empty retrives all stations.
-func (c Client) List(ids ...StationID) ([]Metrolink, error) {
-	resp, err := http.Get(c.url)
+func (c Client) List(ids ...string) ([]Metrolink, error) {
+	query := "/?ids=" + strings.Join([]string(ids), ",")
+	resp, err := http.Get(c.url + query)
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +37,6 @@ func (c Client) List(ids ...StationID) ([]Metrolink, error) {
 
 	return m.Value, err
 }
-
-// StationID represent a station ID in short (TLARef) form or
-// long station location i.e BCH or Benchill
-type StationID string
 
 // Metrolinks is the JSON struct returned by the backend cloud function.
 type Metrolinks struct {

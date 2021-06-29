@@ -12,10 +12,16 @@ import (
 func TestClient_List(t *testing.T) {
 
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			w.Write([]byte(`{"Value": [{"Id": 1, "TLAREF": "BCH"}]}`))
+		if id := r.URL.Query().Get("ids"); id != "" {
+			w.Write([]byte(`{"Value": [{"Id": 1}]}`))
 			return
 		}
+
+		if r.URL.Path == "/" {
+			w.Write([]byte(`{"Value": [{"Id": 1}, {"Id": 2}]}`))
+			return
+		}
+
 		t.Errorf("unexpected method call %v", r.URL)
 	}))
 
@@ -31,7 +37,16 @@ func TestClient_List(t *testing.T) {
 		if err != nil {
 			assert.Fail(t, "got error", err)
 		}
-		assert.NotEmpty(t, metrolinks)
+		assert.Len(t, metrolinks, 2)
+	})
+
+	t.Run("list specific stations for IDs", func(t *testing.T) {
+		metrolinks, err := client.List("1", "2")
+
+		if err != nil {
+			assert.Fail(t, "got error", err)
+		}
+		assert.Len(t, metrolinks, 1)
 	})
 
 }
