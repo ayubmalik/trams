@@ -12,13 +12,13 @@ import (
 func TestClient_List(t *testing.T) {
 
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if id := r.URL.Query().Get("ids"); id != "" {
-			w.Write([]byte(`{"Value": [{"Id": 1}]}`))
+		if id := r.URL.Query().Get("id"); id != "" {
+			w.Write([]byte(`[{"Id": 1}]`))
 			return
 		}
 
 		if r.URL.Path == "/" {
-			w.Write([]byte(`{"Value": [{"Id": 1}, {"Id": 2}]}`))
+			w.Write([]byte(`[{"Id": 1}, {"Id": 2}]`))
 			return
 		}
 

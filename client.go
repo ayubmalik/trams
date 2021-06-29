@@ -23,24 +23,23 @@ type Client struct {
 // List retrieves information about the specified Metrolink stations.
 // If no station IDs is empty retrives all stations.
 func (c Client) List(ids ...string) ([]Metrolink, error) {
-	query := "/?ids=" + strings.Join([]string(ids), ",")
+	query := ""
+	if len(ids) > 0 {
+		query += "?id=" + strings.Join([]string(ids), "&id=")
+	}
+
 	resp, err := http.Get(c.url + query)
 	if err != nil {
 		return nil, err
 	}
 
-	var m Metrolinks
-	err = json.NewDecoder(resp.Body).Decode(&m)
+	var metrolinks []Metrolink
+	err = json.NewDecoder(resp.Body).Decode(&metrolinks)
 	if err != nil {
 		return nil, err
 	}
 
-	return m.Value, err
-}
-
-// Metrolinks is the JSON struct returned by the backend cloud function.
-type Metrolinks struct {
-	Value []Metrolink
+	return metrolinks, err
 }
 
 // Metrolink provides information for a station location.
