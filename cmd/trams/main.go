@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/ayubmalik/trams"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/urfave/cli/v2"
 )
 
@@ -47,13 +48,57 @@ func main() {
 }
 
 func displayStations(client trams.Client, ids []string) error {
-	stations, err := client.List(ids...)
+	metrolinks, err := client.List(ids...)
 	if err != nil {
 		return err
 	}
 
-	for _, s := range stations {
-		fmt.Printf("%03d %s %s (%s %s)\n", s.Id, s.TLAREF, s.StationLocation, s.PIDREF, s.Direction)
+	for _, m := range metrolinks {
+		fmt.Println(FormatMetrolink(m))
 	}
 	return nil
+}
+
+func FormatMetrolink(m trams.Metrolink) string {
+	pad := 1
+	width := 52
+
+	style := lipgloss.NewStyle().
+		Bold(false).
+		PaddingLeft(pad).
+		PaddingRight(pad).
+		Foreground(lipgloss.Color("215")).
+		// Background(lipgloss.Color("16")).
+		Width(width).
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("199"))
+
+	inline := lipgloss.NewStyle().
+		Inline(true).
+		Bold(true).
+		Foreground(lipgloss.Color("16")).
+		Background(lipgloss.Color("215")).
+		Width(width)
+
+	text := fmt.Sprintf("%s %s (Platform %s %s)", m.TLAREF, m.StationLocation, m.Platform(), m.Direction)
+	text = inline.Render(text)
+
+	if m.Status0 == "" {
+		text += "\nNo information available"
+	}
+	if m.Status0 != "" {
+		text += fmt.Sprintf("\n%sm %s", m.Wait0, m.Dest0)
+	}
+	if m.Status1 != "" {
+		text += fmt.Sprintf("\n%sm %s", m.Wait1, m.Dest1)
+	}
+
+	if m.Status2 != "" {
+		text += fmt.Sprintf("\n%sm %s", m.Wait2, m.Dest2)
+	}
+
+	inline2 := lipgloss.NewStyle().Inline(true).Foreground(lipgloss.Color("230"))
+	text += "\n\n" + inline2.Render(m.MessageBoard)
+	return style.Render(text)
+
 }

@@ -71,6 +71,10 @@ type Metrolink struct {
 	LastUpdated     time.Time
 }
 
+func (m Metrolink) Platform() string {
+	return m.PIDREF[len(m.PIDREF)-1:]
+}
+
 /*
 sample API response
 {
