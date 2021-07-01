@@ -20,9 +20,9 @@ type Client struct {
 	timeout int
 }
 
-// List retrieves information about the specified Metrolink stations.
+// Get retrieves information about the specified Metrolink stations.
 // If no station IDs is empty retrives all stations.
-func (c Client) List(ids ...string) ([]Metrolink, error) {
+func (c Client) Get(ids ...string) ([]Metrolink, error) {
 	query := ""
 	if len(ids) > 0 {
 		query += "?id=" + strings.Join([]string(ids), "&id=")
@@ -40,6 +40,22 @@ func (c Client) List(ids ...string) ([]Metrolink, error) {
 	}
 
 	return metrolinks, err
+}
+
+// List all available station IDs.
+func (c Client) List() ([]StationID, error) {
+	resp, err := http.Get(c.url)
+	if err != nil {
+		return nil, err
+	}
+
+	var stationIDs []StationID
+	err = json.NewDecoder(resp.Body).Decode(&stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return stationIDs, err
 }
 
 // Metrolink provides information for a station location.
@@ -69,6 +85,13 @@ type Metrolink struct {
 	MessageBoard    string
 	Wait3           string
 	LastUpdated     time.Time
+}
+
+// StationID identifies a Metrolink station.
+type StationID struct {
+	Id              int
+	TLAREF          string
+	StationLocation string
 }
 
 /*

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/ayubmalik/trams"
 	"github.com/urfave/cli/v2"
@@ -25,7 +26,15 @@ func main() {
 				Usage:     "display tram information for specified Metrolink stations. If no stations are specified displays all stations. Run `trams help display` for more details.",
 				UsageText: "display [STATION...] - If no STATION arguments are specified, displays all stations. Multiple STATION arguments can be specified as short name or long name, e.g. `display BCH MAN` or `display Benchill MAN`",
 				Action: func(c *cli.Context) error {
-					err := displayStations(client, c.Args().Slice())
+					err := displayMetrolinks(client, c.Args().Slice())
+					return err
+				},
+			},
+			{
+				Name:  "list",
+				Usage: "list all stations with ID and location so can be used by 'display' command.",
+				Action: func(c *cli.Context) error {
+					err := listStations(client)
 					return err
 				},
 			},
@@ -46,14 +55,45 @@ func main() {
 	}
 }
 
-func displayStations(client trams.Client, ids []string) error {
-	stations, err := client.List(ids...)
+func displayMetrolinks(client trams.Client, ids []string) error {
+	metrolinks, err := client.Get(ids...)
 	if err != nil {
 		return err
 	}
 
-	for _, s := range stations {
+	for _, s := range metrolinks {
 		fmt.Printf("%03d %s %s (%s %s)\n", s.Id, s.TLAREF, s.StationLocation, s.PIDREF, s.Direction)
 	}
 	return nil
+}
+
+func listStations(client trams.Client) error {
+	stationIDs, err := client.List()
+	if err != nil {
+		return err
+	}
+
+	uniqueNames := make([]string, 0)
+
+	for _, s := range stationIDs {
+		name := fmt.Sprintf("%s %s", s.TLAREF, s.StationLocation)
+		if !contains(uniqueNames, name) {
+			uniqueNames = append(uniqueNames, name)
+		}
+	}
+
+	sort.Strings(uniqueNames)
+	for _, s := range uniqueNames {
+		fmt.Println(s)
+	}
+	return nil
+}
+
+func contains(values []string, s string) bool {
+	for _, v := range values {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }
