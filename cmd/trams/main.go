@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"sort"
 
 	"github.com/ayubmalik/trams"
@@ -69,7 +70,7 @@ func displayMetrolinks(client trams.Client, ids []string) error {
 }
 
 func listStations(client trams.Client) error {
-	stationIDs, err := client.List()
+	stationIDs, err := cachedStations(client)
 	if err != nil {
 		return err
 	}
@@ -87,6 +88,20 @@ func listStations(client trams.Client) error {
 		fmt.Println(style.StationName(s))
 	}
 	return nil
+}
+
+func cachedStations(client trams.Client) ([]trams.StationID, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	cache := path.Join(home, ".trams-cache")
+	if _, err := os.Stat(cache); os.IsNotExist(err) {
+		fmt.Println("TODO")
+	}
+
+	return client.List()
 }
 
 func contains(values []string, s string) bool {
