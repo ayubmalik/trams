@@ -68,7 +68,7 @@ func FormatMetrolink(m trams.Metrolink) string {
 		PaddingLeft(pad).
 		PaddingRight(pad).
 		Foreground(lipgloss.Color("215")).
-		// Background(lipgloss.Color("16")).
+		Background(lipgloss.Color("234")).
 		Width(width).
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("199"))
