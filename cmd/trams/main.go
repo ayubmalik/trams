@@ -7,6 +7,7 @@ import (
 	"sort"
 
 	"github.com/ayubmalik/trams"
+	"github.com/ayubmalik/trams/style"
 	"github.com/urfave/cli/v2"
 )
 
@@ -74,9 +75,8 @@ func listStations(client trams.Client) error {
 	}
 
 	uniqueNames := make([]string, 0)
-
 	for _, s := range stationIDs {
-		name := fmt.Sprintf("%s %s", s.TLAREF, s.StationLocation)
+		name := fmt.Sprintf("%s %-24s", s.TLAREF, s.StationLocation)
 		if !contains(uniqueNames, name) {
 			uniqueNames = append(uniqueNames, name)
 		}
@@ -84,7 +84,7 @@ func listStations(client trams.Client) error {
 
 	sort.Strings(uniqueNames)
 	for _, s := range uniqueNames {
-		fmt.Println(s)
+		fmt.Println(style.StationName(s))
 	}
 	return nil
 }
