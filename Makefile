@@ -7,7 +7,7 @@ build: test
 check-env:
 
 test: clean
-	go test ./
+	go test ./...	
 
 clean:
 	@go clean -testcache
