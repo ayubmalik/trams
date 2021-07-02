@@ -118,7 +118,6 @@ func contains(values []string, s string) bool {
 
 func DisplayUI() {
 	app := tview.NewApplication()
-
 	flex := tview.NewFlex().
 		AddItem(tview.NewBox().SetBorder(true).SetTitle("1 (1/2 x width of Top)"), 0, 1, false).
 		AddItem(tview.NewBox().SetBorder(true).SetTitle("2 (1/2 x width of Top)"), 0, 1, false).
@@ -130,8 +129,13 @@ func DisplayUI() {
 		AddItem(tview.NewBox().SetBorder(true).SetTitle("Right (20 cols)"), 20, 1, false)
 
 	go func() {
-		time.Sleep(667 * time.Millisecond)
-		app.EnableMouse(false) // TODO: reset screen
+		time.Sleep(50 * time.Millisecond)
+		app.EnableMouse(false)
+		fmt.Println("\x1b[31mBoom\x1b[0mShoom1")
+		fmt.Printf("\x1b[?20h\n")
+		fmt.Println("What")
+		fmt.Println("The")
+		fmt.Println("Funk")
 		os.Exit(0)
 	}()
 
