@@ -87,6 +87,10 @@ type Metrolink struct {
 	LastUpdated     time.Time
 }
 
+func (m Metrolink) Platform() string {
+	return m.PIDREF[len(m.PIDREF)-1:]
+}
+
 // StationID identifies a Metrolink station.
 type StationID struct {
 	Id              int
@@ -94,7 +98,7 @@ type StationID struct {
 	StationLocation string
 }
 
-/*
+/* TODO: remove
 sample API response
 {
     "Id": 699,
