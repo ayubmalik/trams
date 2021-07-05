@@ -1,7 +1,6 @@
 package style
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -40,6 +39,5 @@ func TestStyle_FormatMetrolink(t *testing.T) {
 	}
 
 	formatted := FormatMetrolink(m)
-	fmt.Printf(formatted)
 	assert.NotEmpty(t, formatted)
 }
