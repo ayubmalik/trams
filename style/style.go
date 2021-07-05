@@ -29,7 +29,7 @@ type FormattedMetrolink struct {
 
 func FormatMetrolink(m trams.Metrolink, colorIndex int) string {
 	pad := 1
-	width := 52
+	width := 34
 	color := strconv.Itoa(161 + colorIndex*6) // ansi color index rainbow effect
 	style := lipgloss.NewStyle().
 		Bold(false).
@@ -44,24 +44,23 @@ func FormatMetrolink(m trams.Metrolink, colorIndex int) string {
 	inline := style.Copy().
 		Inline(true).
 		Bold(true).
-		Reverse(true).
-		Width(width)
+		Reverse(true)
 
-	text := inline.Render(fmt.Sprintf("%s %s", m.TLAREF, strings.ToUpper(m.StationLocation))) + "\n"
+	text := inline.Render(fmt.Sprintf("%2s %s", m.TLAREF, strings.ToUpper(m.StationLocation))) + "\n"
 	text += inline.Render(fmt.Sprintf("Platform %s (%s)", m.Platform(), m.Direction))
 
 	if m.Status0 == "" {
 		text += "\nNo information available"
 	}
 	if m.Status0 != "" {
-		text += fmt.Sprintf("\n%sm %s", m.Wait0, m.Dest0)
+		text += fmt.Sprintf("\n%2sm %s", m.Wait0, m.Dest0)
 	}
 	if m.Status1 != "" {
-		text += fmt.Sprintf("\n%sm %s", m.Wait1, m.Dest1)
+		text += fmt.Sprintf("\n%2sm %s", m.Wait1, m.Dest1)
 	}
 
 	if m.Status2 != "" {
-		text += fmt.Sprintf("\n%sm %s", m.Wait2, m.Dest2)
+		text += fmt.Sprintf("\n%2sm %s", m.Wait2, m.Dest2)
 	}
 
 	inline2 := lipgloss.NewStyle().Inline(true).Foreground(lipgloss.Color("230"))
