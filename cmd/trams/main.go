@@ -64,7 +64,7 @@ func displayMetrolinks(client trams.Client, ids []string) error {
 	}
 
 	for _, m := range metrolinks {
-		fmt.Println(style.FormatMetrolink(m))
+		fmt.Println(style.FormatMetrolink(m, 0))
 	}
 	return nil
 }

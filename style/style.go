@@ -3,6 +3,7 @@ package style
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/ayubmalik/trams"
 	"github.com/charmbracelet/lipgloss"
@@ -26,29 +27,28 @@ type FormattedMetrolink struct {
 	Details string
 }
 
-func FormatMetrolink(m trams.Metrolink) string {
+func FormatMetrolink(m trams.Metrolink, colorIndex int) string {
 	pad := 1
 	width := 52
-
+	color := strconv.Itoa(161 + colorIndex*6) // ansi color index rainbow effect
 	style := lipgloss.NewStyle().
 		Bold(false).
 		PaddingLeft(pad).
 		PaddingRight(pad).
-		Foreground(lipgloss.Color("215")).
-		Background(lipgloss.Color("234")).
+		Foreground(lipgloss.Color(color)).
+		// Background(lipgloss.Color("234")).
 		Width(width).
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("199"))
+		BorderForeground(lipgloss.Color(color))
 
-	inline := lipgloss.NewStyle().
+	inline := style.Copy().
 		Inline(true).
 		Bold(true).
-		Foreground(lipgloss.Color("16")).
-		Background(lipgloss.Color("215")).
+		Reverse(true).
 		Width(width)
 
-	text := fmt.Sprintf("%s %s (Platform %s %s)", m.TLAREF, m.StationLocation, m.Platform(), m.Direction)
-	text = inline.Render(text)
+	text := inline.Render(fmt.Sprintf("%s %s", m.TLAREF, strings.ToUpper(m.StationLocation))) + "\n"
+	text += inline.Render(fmt.Sprintf("Platform %s (%s)", m.Platform(), m.Direction))
 
 	if m.Status0 == "" {
 		text += "\nNo information available"
