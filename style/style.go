@@ -74,13 +74,17 @@ func (fs FormattedStationID) String() string {
 
 func FormatStationID(stationID string, colorIndex int) string {
 	n := strconv.Itoa(colorIndex)
-	style := lipgloss.NewStyle().
+	style1 := lipgloss.NewStyle().
 		Bold(true).
-		Foreground(lipgloss.Color(n)).
-		Inline(true).
-		Width(30)
+		Foreground(lipgloss.Color(n))
+	style2 := style1.Copy().
+		Bold(true)
 
-	return style.Render(stationID)
+	if stationID == "" {
+		return stationID
+	}
+
+	return style1.Render(stationID[:3]) + style2.Render(stationID[3:])
 }
 
 func StationIDRows(stationIDs []string) []string {
@@ -98,10 +102,11 @@ func StationIDRows(stationIDs []string) []string {
 		if (i + 2) <= count {
 			right = padRight(stationIDs[i+2])
 		}
-		row = lipgloss.JoinHorizontal(lipgloss.Right, left, middle, right)
+		row = lipgloss.JoinHorizontal(lipgloss.Right, FormatStationID(left, colorIndex),
+			FormatStationID(middle, colorIndex), FormatStationID(right, colorIndex))
 
 		if i%cols == 0 {
-			rows = append(rows, FormatStationID(row, colorIndex))
+			rows = append(rows, row)
 			row = ""
 		}
 
