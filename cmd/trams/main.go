@@ -6,11 +6,9 @@ import (
 	"os"
 	"path"
 	"sort"
-	"time"
 
 	"github.com/ayubmalik/trams"
 	"github.com/ayubmalik/trams/style"
-	"github.com/rivo/tview"
 	"github.com/urfave/cli/v2"
 )
 
@@ -47,7 +45,6 @@ func main() {
 				Usage: "version of trams app.",
 				Action: func(c *cli.Context) error {
 					fmt.Println(version)
-					DisplayUI()
 					return nil
 				},
 			},
@@ -66,8 +63,8 @@ func displayMetrolinks(client trams.Client, ids []string) error {
 		return err
 	}
 
-	for _, s := range metrolinks {
-		fmt.Printf("%03d %s %s (%s %s)\n", s.Id, s.TLAREF, s.StationLocation, s.PIDREF, s.Direction)
+	for _, m := range metrolinks {
+		fmt.Println(style.FormatMetrolink(m))
 	}
 	return nil
 }
@@ -114,32 +111,4 @@ func contains(values []string, s string) bool {
 		}
 	}
 	return false
-}
-
-func DisplayUI() {
-	app := tview.NewApplication()
-	flex := tview.NewFlex().
-		AddItem(tview.NewBox().SetBorder(true).SetTitle("1 (1/2 x width of Top)"), 0, 1, false).
-		AddItem(tview.NewBox().SetBorder(true).SetTitle("2 (1/2 x width of Top)"), 0, 1, false).
-		AddItem(tview.NewBox().SetBorder(true).SetTitle("2 (1/2 x width of Top)"), 0, 1, false).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Top"), 0, 1, false).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Middle (3 x height of Top)"), 0, 3, false).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Bottom (5 rows)"), 5, 1, false), 0, 2, false).
-		AddItem(tview.NewBox().SetBorder(true).SetTitle("Right (20 cols)"), 20, 1, false)
-
-	go func() {
-		time.Sleep(50 * time.Millisecond)
-		app.EnableMouse(false)
-		fmt.Println("\x1b[31mBoom\x1b[0mShoom1")
-		fmt.Printf("\x1b[?20h\n")
-		fmt.Println("What")
-		fmt.Println("The")
-		fmt.Println("Funk")
-		os.Exit(0)
-	}()
-
-	if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
-		panic(err)
-	}
 }
