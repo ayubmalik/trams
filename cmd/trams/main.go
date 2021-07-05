@@ -84,8 +84,10 @@ func listStations(client trams.Client) error {
 	}
 
 	sort.Strings(uniqueNames)
-	for _, s := range uniqueNames {
-		fmt.Println(style.StationName(s))
+	rows := style.StationIDRows(uniqueNames)
+	for _, r := range rows {
+		fmt.Println(r)
+
 	}
 	return nil
 }

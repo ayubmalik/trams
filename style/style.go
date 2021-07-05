@@ -9,45 +9,41 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func StationName(name string) string {
-	i := int(name[0]) + 134
-	n := strconv.Itoa(i)
-	style := lipgloss.NewStyle().
-		Bold(false).
-		Foreground(lipgloss.Color(n)).
-		Width(30).
-		Inline(true)
-
-	return style.Render(name)
-}
+const (
+	colorStart = 130
+	lineWidth  = 120
+	pad        = 1
+)
 
 type FormattedMetrolink struct {
-	trams.Metrolink
-	Header  string
-	Details string
+	text string
 }
 
-func FormatMetrolink(m trams.Metrolink, colorIndex int) string {
-	pad := 1
+func (fm FormattedMetrolink) String() string {
+	return fm.text
+}
+
+func FormatMetrolink(m trams.Metrolink, colorIndex int) FormattedMetrolink {
 	width := 34
-	color := strconv.Itoa(161 + colorIndex*6) // ansi color index rainbow effect
-	style := lipgloss.NewStyle().
+	color := strconv.Itoa(colorStart + colorIndex*6) // ansi color index rainbow effect
+	mainStyle := lipgloss.NewStyle().
 		Bold(false).
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color(color)).
+		Foreground(lipgloss.Color(color)).
+		Inline(false).
 		PaddingLeft(pad).
 		PaddingRight(pad).
-		Foreground(lipgloss.Color(color)).
-		// Background(lipgloss.Color("234")).
-		Width(width).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color(color))
+		Reverse(false).
+		Width(width)
 
-	inline := style.Copy().
+	inline := mainStyle.Copy().
 		Inline(true).
 		Bold(true).
 		Reverse(true)
 
-	text := inline.Render(fmt.Sprintf("%2s %s", m.TLAREF, strings.ToUpper(m.StationLocation))) + "\n"
-	text += inline.Render(fmt.Sprintf("Platform %s (%s)", m.Platform(), m.Direction))
+	text := inline.Render(fmt.Sprintf("%2s %s", m.TLAREF, strings.ToUpper(m.StationLocation)))
+	// text += inline.Render(fmt.Sprintf("Platform %s (%s)", m.Platform(), m.Direction))
 
 	if m.Status0 == "" {
 		text += "\nNo information available"
@@ -63,7 +59,62 @@ func FormatMetrolink(m trams.Metrolink, colorIndex int) string {
 		text += fmt.Sprintf("\n%2sm %s", m.Wait2, m.Dest2)
 	}
 
-	inline2 := lipgloss.NewStyle().Inline(true).Foreground(lipgloss.Color("230"))
-	text += "\n\n" + inline2.Render(m.MessageBoard)
-	return style.Render(text)
+	// inline2 := lipgloss.NewStyle().Inline(true).Foreground(lipgloss.Color("230"))
+	// text += "\n\n" + inline2.Render(m.MessageBoard)
+	return FormattedMetrolink{text: mainStyle.Render(text)}
+}
+
+type FormattedStationID struct {
+	text string
+}
+
+func (fs FormattedStationID) String() string {
+	return fs.text
+}
+
+func FormatStationID(stationID string, colorIndex int) string {
+	n := strconv.Itoa(colorIndex)
+	style := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(n)).
+		Inline(true).
+		Width(30)
+
+	return style.Render(stationID)
+}
+
+func StationIDRows(stationIDs []string) []string {
+	cols := 3
+	count := len(stationIDs) - 1
+	rows := make([]string, 0)
+	row := ""
+	colorIndex := 161
+	for i, s := range stationIDs {
+		var left, middle, right string
+		left = padRight(s)
+		if (i + 1) <= count {
+			middle = padRight(stationIDs[i+1])
+		}
+		if (i + 2) <= count {
+			right = padRight(stationIDs[i+2])
+		}
+		row = lipgloss.JoinHorizontal(lipgloss.Right, left, middle, right)
+
+		if i%cols == 0 {
+			rows = append(rows, FormatStationID(row, colorIndex))
+			row = ""
+		}
+
+		if i%(cols*6) == 0 {
+			colorIndex += 6
+			if colorIndex > 231 {
+				colorIndex = 161
+			}
+		}
+	}
+	return rows
+}
+
+func padRight(s string) string {
+	return fmt.Sprintf("%-*s", lineWidth/3, s)
 }
