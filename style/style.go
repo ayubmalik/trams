@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	colorStart = 130
+	colorStart = 161
 	lineWidth  = 120
 	pad        = 1
 )
@@ -64,27 +64,13 @@ func FormatMetrolink(m trams.Metrolink, colorIndex int) FormattedMetrolink {
 	return FormattedMetrolink{text: mainStyle.Render(text)}
 }
 
-type FormattedStationID struct {
-	text string
-}
-
-func (fs FormattedStationID) String() string {
-	return fs.text
-}
-
 func FormatStationID(stationID string, colorIndex int) string {
-	n := strconv.Itoa(colorIndex)
-	style1 := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color(n))
-	style2 := style1.Copy().
-		Bold(true)
-
 	if stationID == "" {
 		return stationID
 	}
 
-	return style1.Render(stationID[:3]) + style2.Render(stationID[3:])
+	n := strconv.Itoa(colorIndex)
+	return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(n)).Render(stationID)
 }
 
 func StationIDRows(stationIDs []string) []string {
@@ -92,7 +78,7 @@ func StationIDRows(stationIDs []string) []string {
 	count := len(stationIDs) - 1
 	rows := make([]string, 0)
 	row := ""
-	colorIndex := 161
+	colorIndex := colorStart
 	for i, s := range stationIDs {
 		var left, middle, right string
 		left = padRight(s)
@@ -113,7 +99,7 @@ func StationIDRows(stationIDs []string) []string {
 		if i%(cols*6) == 0 {
 			colorIndex += 6
 			if colorIndex > 231 {
-				colorIndex = 161
+				colorIndex = colorStart
 			}
 		}
 	}
