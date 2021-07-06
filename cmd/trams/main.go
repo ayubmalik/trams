@@ -77,7 +77,7 @@ func listStations(client trams.Client) error {
 
 	uniqueNames := make([]string, 0)
 	for _, s := range stationIDs {
-		name := fmt.Sprintf("%s %s", s.TLAREF, s.StationLocation)
+		name := fmt.Sprintf("| %s | %-40s", s.TLAREF, s.StationLocation)
 		if !contains(uniqueNames, name) {
 			uniqueNames = append(uniqueNames, name)
 		}
