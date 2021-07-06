@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -12,7 +13,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const apiURL = "https://europe-west2-tramsfunc.cloudfunctions.net/tramsfunc"
+const (
+	apiURL = "https://europe-west2-tramsfunc.cloudfunctions.net/tramsfunc"
+)
 
 var version = "dev"
 
@@ -70,17 +73,22 @@ func displayMetrolinks(client trams.Client, ids []string) error {
 }
 
 func listStations(client trams.Client) error {
-	stationIDs, err := cachedStations(client)
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	cache := path.Join(home, ".trams-cache")
+
+	stationIDs, err := cachedStations(client, cache)
 	if err != nil {
 		return err
 	}
 
 	uniqueNames := make([]string, 0)
 	for _, s := range stationIDs {
-		name := fmt.Sprintf("| %s | %-40s", s.TLAREF, s.StationLocation)
-		if !contains(uniqueNames, name) {
-			uniqueNames = append(uniqueNames, name)
-		}
+		// TODO: move to style pkg
+		name := fmt.Sprintf("| %s | %-40s", s[0].TLAREF, s[0].StationLocation)
+		uniqueNames = append(uniqueNames, name)
 	}
 
 	sort.Strings(uniqueNames)
@@ -91,25 +99,40 @@ func listStations(client trams.Client) error {
 	return nil
 }
 
-func cachedStations(client trams.Client) ([]trams.StationID, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
+func cachedStations(client trams.Client, cache string) (map[string][]trams.StationID, error) {
+	var stationIDs []trams.StationID
+	var grouped map[string][]trams.StationID
 
-	cache := path.Join(home, ".trams-cache")
 	if _, err := os.Stat(cache); os.IsNotExist(err) {
-		fmt.Println("TODO")
+		stationIDs, err = client.List()
+		if err != nil {
+			return nil, err
+		}
+
+		f, err := os.Create(cache)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		json.NewEncoder(f).Encode(stationIDs)
+	} else {
+		f, err := os.Open(cache)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		json.NewDecoder(f).Decode(&stationIDs)
 	}
 
-	return client.List()
+	grouped = groupStationsByRef(stationIDs)
+	return grouped, nil
 }
 
-func contains(values []string, s string) bool {
-	for _, v := range values {
-		if v == s {
-			return true
-		}
+// TODO move to trams pkg
+func groupStationsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {
+	gs := make(map[string][]trams.StationID)
+	for _, s := range stationIDS {
+		gs[s.TLAREF] = append(gs[s.TLAREF], s)
 	}
-	return false
+	return gs
 }
