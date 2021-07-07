@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"strconv"
 
 	"github.com/ayubmalik/trams"
 	"github.com/ayubmalik/trams/style"
@@ -60,7 +61,8 @@ func main() {
 	}
 }
 
-func displayMetrolinks(client trams.Client, ids []string) error {
+func displayMetrolinks(client trams.Client, refs []string) error {
+	ids := lookupIDs(client, refs)
 	metrolinks, err := client.Get(ids...)
 	if err != nil {
 		return err
@@ -70,6 +72,28 @@ func displayMetrolinks(client trams.Client, ids []string) error {
 		fmt.Println(style.FormatMetrolink(m, 0))
 	}
 	return nil
+}
+
+func lookupIDs(client trams.Client, refs []string) []string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil
+	}
+	cache := path.Join(home, ".trams-cache")
+
+	grouped, err := cachedStations(client, cache)
+	if err != nil {
+		return nil
+	}
+
+	ids := make([]string, 0)
+	for _, r := range refs {
+		stationIDs := grouped[r]
+		for _, s := range stationIDs {
+			ids = append(ids, strconv.Itoa(s.Id))
+		}
+	}
+	return ids
 }
 
 func listStations(client trams.Client) error {
@@ -128,7 +152,6 @@ func cachedStations(client trams.Client, cache string) (map[string][]trams.Stati
 	return grouped, nil
 }
 
-// TODO move to trams pkg
 func groupStationsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {
 	gs := make(map[string][]trams.StationID)
 	for _, s := range stationIDS {
