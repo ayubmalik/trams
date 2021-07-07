@@ -110,8 +110,7 @@ func listStations(client trams.Client) error {
 
 	uniqueNames := make([]string, 0)
 	for _, s := range stationIDs {
-		// TODO: move to style pkg
-		name := fmt.Sprintf("| %s | %-40s", s[0].TLAREF, s[0].StationLocation)
+		name := style.FormatStationID(s[0])
 		uniqueNames = append(uniqueNames, name)
 	}
 
