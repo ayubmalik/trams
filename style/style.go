@@ -64,13 +64,8 @@ func FormatMetrolink(m trams.Metrolink, colorIndex int) FormattedMetrolink {
 	return FormattedMetrolink{text: mainStyle.Render(text)}
 }
 
-func FormatStationID(stationID string, colorIndex int) string {
-	if stationID == "" {
-		return stationID
-	}
-
-	n := strconv.Itoa(colorIndex)
-	return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(n)).Render(stationID)
+func FormatStationID(s trams.StationID) string {
+	return fmt.Sprintf("| %s | %-40s", s.TLAREF, s.StationLocation)
 }
 
 func StationIDRows(stationIDs []string) []string {
@@ -88,8 +83,12 @@ func StationIDRows(stationIDs []string) []string {
 		if (i + 2) <= count {
 			right = padRight(stationIDs[i+2])
 		}
-		row = lipgloss.JoinHorizontal(lipgloss.Right, FormatStationID(left, colorIndex),
-			FormatStationID(middle, colorIndex), FormatStationID(right, colorIndex))
+		row = lipgloss.JoinHorizontal(
+			lipgloss.Right,
+			colorizeStationID(left, colorIndex),
+			colorizeStationID(middle, colorIndex),
+			colorizeStationID(right, colorIndex),
+		)
 
 		if i%cols == 0 {
 			rows = append(rows, row)
@@ -104,6 +103,15 @@ func StationIDRows(stationIDs []string) []string {
 		}
 	}
 	return rows
+}
+
+func colorizeStationID(stationID string, colorIndex int) string {
+	if stationID == "" {
+		return stationID
+	}
+
+	n := strconv.Itoa(colorIndex)
+	return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(n)).Render(stationID)
 }
 
 func padRight(s string) string {
