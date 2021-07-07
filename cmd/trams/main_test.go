@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -55,8 +54,7 @@ func TestReadCachedStations(t *testing.T) {
 			assert.FailNow(t, "error reading stations from cache", err)
 		}
 
-		// assert.Len(t, stations, 1)
-		fmt.Println("YYYY", stations)
+		assert.Len(t, stations, 1)
 		assert.Equal(t, "Station From Cache", stations["REF1"][0].StationLocation)
 	})
 }

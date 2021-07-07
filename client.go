@@ -98,7 +98,7 @@ type StationID struct {
 	StationLocation string
 }
 
-/*
+/* TODO: remove
 sample API response
 {
     "Id": 699,
