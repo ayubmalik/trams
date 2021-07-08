@@ -21,7 +21,6 @@ const (
 var version = "dev"
 
 func main() {
-	client := trams.NewClient(apiURL, 1000)
 
 	app := &cli.App{
 		Usage:     "display Metrolink tram information using data from TfGM API",
@@ -30,17 +29,17 @@ func main() {
 			{
 				Name:      "display",
 				Usage:     "display tram information for specified Metrolink stations. If no stations are specified displays all stations. Run `trams help display` for more details.",
-				UsageText: "display [STATION...] - If no STATION arguments are specified, displays all stations. Multiple STATION arguments can be specified as short name or long name, e.g. `display BCH MAN` or `display Benchill MAN`",
+				UsageText: "display [STATION...] - If no STATION arguments are specified, displays all stations. Multiple STATION arguments can be specified as short name e.g. `display BCH MAN VIC`",
 				Action: func(c *cli.Context) error {
-					err := displayMetrolinks(client, c.Args().Slice())
+					err := displayMetrolinks(c.Args().Slice())
 					return err
 				},
 			},
 			{
 				Name:  "list",
-				Usage: "list all stations with ID and location so can be used by 'display' command.",
+				Usage: "list all stations with short name (TLAREF) and name so can be used by 'display' command.",
 				Action: func(c *cli.Context) error {
-					err := listStations(client)
+					err := listStations()
 					return err
 				},
 			},
@@ -61,8 +60,14 @@ func main() {
 	}
 }
 
-func displayMetrolinks(client trams.Client, refs []string) error {
-	ids := lookupIDs(client, refs)
+func displayMetrolinks(refs []string) error {
+	groupedStationIDs, err := getAllStationsGroupedByRef()
+	if err != nil {
+		return err
+	}
+	ids := lookupIDs(groupedStationIDs, refs)
+
+	client := trams.NewClient(apiURL, 1000)
 	metrolinks, err := client.Get(ids...)
 	if err != nil {
 		return err
@@ -74,21 +79,10 @@ func displayMetrolinks(client trams.Client, refs []string) error {
 	return nil
 }
 
-func lookupIDs(client trams.Client, refs []string) []string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil
-	}
-	cache := path.Join(home, ".trams-cache")
-
-	grouped, err := cachedStations(client, cache)
-	if err != nil {
-		return nil
-	}
-
+func lookupIDs(groupedStationIDs map[string][]trams.StationID, refs []string) []string {
 	ids := make([]string, 0)
 	for _, r := range refs {
-		stationIDs := grouped[r]
+		stationIDs := groupedStationIDs[r]
 		for _, s := range stationIDs {
 			ids = append(ids, strconv.Itoa(s.Id))
 		}
@@ -96,20 +90,14 @@ func lookupIDs(client trams.Client, refs []string) []string {
 	return ids
 }
 
-func listStations(client trams.Client) error {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	cache := path.Join(home, ".trams-cache")
-
-	stationIDs, err := cachedStations(client, cache)
+func listStations() error {
+	groupedStationIDs, err := getAllStationsGroupedByRef()
 	if err != nil {
 		return err
 	}
 
 	uniqueNames := make([]string, 0)
-	for _, s := range stationIDs {
+	for _, s := range groupedStationIDs {
 		name := style.FormatStationID(s[0])
 		uniqueNames = append(uniqueNames, name)
 	}
@@ -120,6 +108,29 @@ func listStations(client trams.Client) error {
 		fmt.Println(r)
 	}
 	return nil
+}
+
+func getCacheFile() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	cache := path.Join(home, ".trams-cache")
+	return cache, nil
+}
+
+func getAllStationsGroupedByRef() (map[string][]trams.StationID, error) {
+	client := trams.NewClient(apiURL, 1000)
+	cache, err := getCacheFile()
+	if err != nil {
+		return nil, err
+	}
+
+	groupedStationIDs, err := cachedStations(client, cache)
+	if err != nil {
+		return nil, err
+	}
+	return groupedStationIDs, nil
 }
 
 func cachedStations(client trams.Client, cache string) (map[string][]trams.StationID, error) {
