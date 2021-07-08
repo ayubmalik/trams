@@ -73,6 +73,11 @@ func displayMetrolinks(refs []string) error {
 		return err
 	}
 
+	// rows := style.MetrolinkRows(metrolinks)
+	// for _, r := range rows {
+	// 	fmt.Println(r)
+	// }
+
 	for _, m := range metrolinks {
 		fmt.Println(style.FormatMetrolink(m, 0))
 	}
@@ -158,11 +163,11 @@ func cachedStations(client trams.Client, cache string) (map[string][]trams.Stati
 		json.NewDecoder(f).Decode(&stationIDs)
 	}
 
-	grouped = groupStationsByRef(stationIDs)
+	grouped = groupStationIDsByRef(stationIDs)
 	return grouped, nil
 }
 
-func groupStationsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {
+func groupStationIDsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {
 	gs := make(map[string][]trams.StationID)
 	for _, s := range stationIDS {
 		gs[s.TLAREF] = append(gs[s.TLAREF], s)

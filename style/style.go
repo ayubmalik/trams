@@ -24,7 +24,7 @@ func (fm FormattedMetrolink) String() string {
 }
 
 func FormatMetrolink(m trams.Metrolink, colorIndex int) FormattedMetrolink {
-	width := 34
+	width := 40
 	color := strconv.Itoa(colorStart + colorIndex*6) // ansi color index rainbow effect
 	mainStyle := lipgloss.NewStyle().
 		Bold(false).
@@ -42,7 +42,7 @@ func FormatMetrolink(m trams.Metrolink, colorIndex int) FormattedMetrolink {
 		Bold(true).
 		Reverse(true)
 
-	text := inline.Render(fmt.Sprintf("%2s %s", m.TLAREF, strings.ToUpper(m.StationLocation)))
+	text := inline.Render(fmt.Sprintf("%3s %s (Plat.%s)", m.TLAREF, strings.ToUpper(m.StationLocation), m.Platform()))
 	// text += inline.Render(fmt.Sprintf("Platform %s (%s)", m.Platform(), m.Direction))
 
 	if m.Status0 == "" {
@@ -66,6 +66,32 @@ func FormatMetrolink(m trams.Metrolink, colorIndex int) FormattedMetrolink {
 
 func FormatStationID(s trams.StationID) string {
 	return fmt.Sprintf("| %s | %-40s", s.TLAREF, s.StationLocation)
+}
+
+func MetrolinkRows(metrolinks []trams.Metrolink) []string {
+	groupedMetrolinks := groupMetrolinksByRef(metrolinks)
+	rows := make([]string, 0)
+	colorIndex := colorStart
+	for _, v := range groupedMetrolinks {
+		count := len(v) - 1
+		var left, middle, right FormattedMetrolink
+		left = FormatMetrolink(v[0], colorIndex)
+		if count > 1 {
+			middle = FormatMetrolink(v[1], colorIndex)
+		}
+		if count > 2 {
+			middle = FormatMetrolink(v[2], colorIndex)
+		}
+
+		row := lipgloss.JoinHorizontal(
+			lipgloss.Right,
+			left.String(),
+			middle.String(),
+			right.String(),
+		)
+		rows = append(rows, row)
+	}
+	return rows
 }
 
 func StationIDRows(stationIDs []string) []string {
@@ -116,4 +142,12 @@ func colorizeStationID(stationID string, colorIndex int) string {
 
 func padRight(s string) string {
 	return fmt.Sprintf("%-*s", lineWidth/3, s)
+}
+
+func groupMetrolinksByRef(metrolinks []trams.Metrolink) map[string][]trams.Metrolink {
+	gm := make(map[string][]trams.Metrolink)
+	for _, m := range metrolinks {
+		gm[m.TLAREF] = append(gm[m.TLAREF], m)
+	}
+	return gm
 }
