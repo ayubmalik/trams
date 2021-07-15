@@ -97,34 +97,3 @@ type StationID struct {
 	TLAREF          string
 	StationLocation string
 }
-
-/* TODO: remove
-sample API response
-{
-    "Id": 699,
-    "Line": "Airport",
-    "TLAREF": "BCH",
-    "PIDREF": "BCH-TPID01",
-    "StationLocation": "Benchill",
-    "AtcoCode": "9400ZZMABLL1",
-    "Direction": "Outgoing",
-    "Dest0": "Manchester Airport",
-    "Carriages0": "Single",
-    "Status0": "Due",
-    "Wait0": "12",
-    "Dest1": "Manchester Airport",
-    "Carriages1": "Single",
-    "Status1": "Due",
-    "Wait1": "18",
-    "Dest2": "",
-    "Carriages2": "",
-    "Status2": "",
-    "Wait2": "",
-    "Dest3": "",
-    "Carriages3": "",
-    "Status3": "",
-    "MessageBoard": "Services are now able to run through Piccadilly. Thank you for your patience during this time and we apologise for any inconvenience this may have caused to your journey this morning",
-    "Wait3": "",
-    "LastUpdated": "2021-06-24T13:26:38Z"
-  }
-*/

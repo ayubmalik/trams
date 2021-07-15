@@ -73,13 +73,9 @@ func displayMetrolinks(refs []string) error {
 		return err
 	}
 
-	// rows := style.MetrolinkRows(metrolinks)
-	// for _, r := range rows {
-	// 	fmt.Println(r)
-	// }
-
-	for _, m := range metrolinks {
-		fmt.Println(style.FormatMetrolink(m, 0))
+	rows := style.MetrolinkRows(metrolinks)
+	for _, r := range rows {
+		fmt.Println(r)
 	}
 	return nil
 }
