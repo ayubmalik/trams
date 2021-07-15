@@ -140,7 +140,7 @@ func getAllStationsGroupedByRef() (map[string][]trams.StationID, error) {
 
 func cachedStations(client trams.Client, cache string) (map[string][]trams.StationID, error) {
 	var stationIDs []trams.StationID
-	var grouped map[string][]trams.StationID
+	var groupedStationIDs map[string][]trams.StationID
 
 	if _, err := os.Stat(cache); os.IsNotExist(err) {
 		stationIDs, err = client.List()
@@ -154,17 +154,17 @@ func cachedStations(client trams.Client, cache string) (map[string][]trams.Stati
 		}
 		defer f.Close()
 		json.NewEncoder(f).Encode(stationIDs)
-	} else {
-		f, err := os.Open(cache)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		json.NewDecoder(f).Decode(&stationIDs)
 	}
 
-	grouped = groupStationIDsByRef(stationIDs)
-	return grouped, nil
+	f, err := os.Open(cache)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	json.NewDecoder(f).Decode(&stationIDs)
+
+	groupedStationIDs = groupStationIDsByRef(stationIDs)
+	return groupedStationIDs, nil
 }
 
 func groupStationIDsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {
