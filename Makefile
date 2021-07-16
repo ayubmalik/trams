@@ -12,12 +12,15 @@ test: clean
 
 tag-release: changelog	
 	@echo Previous release tag = $(PREVIOUSTAG)
-	@echo New release tag = $(RELEASETAG)
+	@echo New release tag = $(NEWTAG)
 
 changelog:
 	@echo Previous tag = $(PREVIOUSTAG)
-	git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" > changes.txt
-
+	@rm -rf change*.tmp
+	git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" > changes.tmp
+	echo >> changes.tmp
+	sed '/# Changelog/d' CHANGELOG.md > changelog.tmp
+	cat changes.tmp changelog.tmp > newchangelog.tmp
 clean:
 	@go clean -testcache
 
