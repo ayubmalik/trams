@@ -4,6 +4,7 @@ PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 PREVIOUSTAGDATE:=$(shell git log  -1 --format=%as $(PREVIOUSTAG))
 TODAYDATE:=$(shell date +'%Y-%m-%d')
 TMPCHANGES=$(TMPDIR)/changes.tmp
+LDFLAGS="-s -w"
 
 build: test
 	go build -ldflags '$(LDFLAGS) -X "main.version=$(VERSION)"' ./cmd/trams/
@@ -30,8 +31,13 @@ changelog: clean
 	@cat $(TMPCHANGES)
 	@mv $(TMPCHANGES) CHANGELOG.md
 
+binaries: clean
+	@mkdir -p dist/linux dist/darwin dist/windows
+	GOOS=darwin GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/darwin/trams ./cmd/trams
+	
 clean:
 	@rm -rf $(TMPCHANGES)
+	@rm -rf dist
 	@go clean -testcache
 
 help:
