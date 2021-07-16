@@ -13,8 +13,9 @@ test: clean
 	go test ./...	
 
 tag-release: changelog	
-	@git status
+	@git add CHANGELOG.md
 	
+
 changelog:
 	@echo Previous tag = $(PREVIOUSTAG)
 	@echo Previous tag date = $(PREVIOUSTAGDATE)
@@ -26,7 +27,7 @@ changelog:
 	@echo "" >> changes.tmp
 	@sed '/# Changelog/d' CHANGELOG.md > changelog.tmp
 	@cat changes.tmp changelog.tmp > newchangelog.tmp
-	@mv changelog.tmp CHANGELOG.md
+	@mv newchangelog.tmp CHANGELOG.md
 
 clean:
 	@go clean -testcache
