@@ -11,5 +11,6 @@ test: clean
 tag-release:
 	echo release is $${RELEASE}
 	@CHANGES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")
+	echo $${CHANGES}
 clean:
 	@go clean -testcache
