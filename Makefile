@@ -1,18 +1,23 @@
 VERSION=$(shell git describe --tags)
 LDFLAGS=-s -w
+PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 
 build: test
 	go build -ldflags '$(LDFLAGS) -X "main.version=$(VERSION)"' ./cmd/trams/
 
-check-env: 		## check any required environment variables
+check-env:
 
-test: clean 	## clean go testcache
+test: clean
 	go test ./...	
 
-tag-release: 	## tag git repo with specified RELEASE and update CHANGELOG.md
-	echo release is $${RELEASE}
-	@CHANGES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")
-	echo $${CHANGES}
+tag-release: changelog	
+	@echo Previous release tag = $(PREVIOUSTAG)
+	@echo New release tag = $(RELEASETAG)
+
+changelog:
+	@echo Previous tag = $(PREVIOUSTAG)
+	git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" > changes.txt
+
 clean:
 	@go clean -testcache
 
