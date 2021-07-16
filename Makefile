@@ -2,7 +2,7 @@ VERSION=$(shell git describe --tags)
 LDFLAGS=-s -w
 PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 PREVIOUSTAGDATE:=$(shell git log  -1 --format=%as $(PREVIOUSTAG))
-TODAYDATE:=$(shell date +'%y-%m-%d')
+TODAYDATE:=$(shell date +'%Y-%m-%d')
 
 build: test
 	go build -ldflags '$(LDFLAGS) -X "main.version=$(VERSION)"' ./cmd/trams/
@@ -14,7 +14,8 @@ test: clean
 
 tag-release: changelog	
 	@git add CHANGELOG.md
-	
+	@git commit -m  "Release $(NEWTAG) ($(TODAYDATE))"
+	@git tag $(NEWTAG)
 
 changelog:
 	@echo Previous tag = $(PREVIOUSTAG)
@@ -22,7 +23,7 @@ changelog:
 	@rm -rf change*.tmp
 	@echo "# Changelog" > changes.tmp
 	@echo "" >> changes.tmp
-	@echo "## $(NEWTAG) $(TODAYDATE)" >> changes.tmp
+	@echo "## $(NEWTAG) ($(TODAYDATE))" >> changes.tmp
 	@git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" >> changes.tmp
 	@echo "" >> changes.tmp
 	@sed '/# Changelog/d' CHANGELOG.md > changelog.tmp
