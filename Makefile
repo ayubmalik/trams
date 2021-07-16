@@ -8,6 +8,8 @@ check-env:
 
 test: clean
 	go test ./...	
-
+tag-release:
+	echo release is $${RELEASE}
+	@CHANGES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h %s")
 clean:
 	@go clean -testcache
