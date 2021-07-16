@@ -28,10 +28,10 @@ changelog: clean
 	@echo "" >> $(TMPCHANGES)
 	@sed '/# Changelog/d' CHANGELOG.md >> $(TMPCHANGES)
 	@cat $(TMPCHANGES)
-
+	@mv $(TMPCHANGES) CHANGELOG.md
 
 clean:
-	@rm -rf change*.tmp
+	@rm -rf $(TMPCHANGES)
 	@go clean -testcache
 
 help:
