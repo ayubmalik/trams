@@ -1,7 +1,5 @@
 # Changelog
 
-xxx
-
 ## v0.1.3 (2021-07-03)
 change 1
 change 2

@@ -3,6 +3,7 @@ LDFLAGS=-s -w
 PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 PREVIOUSTAGDATE:=$(shell git log  -1 --format=%as $(PREVIOUSTAG))
 TODAYDATE:=$(shell date +'%Y-%m-%d')
+TMPCHANGES=$(TMPDIR)/changes.tmp
 
 build: test
 	go build -ldflags '$(LDFLAGS) -X "main.version=$(VERSION)"' ./cmd/trams/
@@ -10,27 +11,27 @@ build: test
 check-env:
 
 test: clean
-	go test ./...	
+	go test ./...
 
-tag-release: changelog	
+tag-release: changelog
 	@git add CHANGELOG.md
 	@git commit -m  "Release $(NEWTAG) ($(TODAYDATE))"
 	@git tag $(NEWTAG)
 
-changelog:
+changelog: clean
 	@echo Previous tag = $(PREVIOUSTAG)
 	@echo Previous tag date = $(PREVIOUSTAGDATE)
-	@rm -rf change*.tmp
-	@echo "# Changelog" > changes.tmp
-	@echo "" >> changes.tmp
-	@echo "## $(NEWTAG) ($(TODAYDATE))" >> changes.tmp
-	@git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" >> changes.tmp
-	@echo "" >> changes.tmp
-	@sed '/# Changelog/d' CHANGELOG.md > changelog.tmp
-	@cat changes.tmp changelog.tmp > newchangelog.tmp
-	@mv newchangelog.tmp CHANGELOG.md
+	@echo "# Changelog" > $(TMPCHANGES)
+	@echo "" >> $(TMPCHANGES)
+	@echo "## $(NEWTAG) ($(TODAYDATE))" >> $(TMPCHANGES)
+	@git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" >> $(TMPCHANGES)
+	@echo "" >> $(TMPCHANGES)
+	@sed '/# Changelog/d' CHANGELOG.md >> $(TMPCHANGES)
+	@cat $(TMPCHANGES)
+
 
 clean:
+	@rm -rf change*.tmp
 	@go clean -testcache
 
 help:
