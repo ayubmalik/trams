@@ -38,6 +38,6 @@ func TestStyle_FormatMetrolink(t *testing.T) {
 		LastUpdated:     time.Now(),
 	}
 
-	formatted := FormatMetrolink(m, 1)
+	formatted := FormatMetrolink(m, 1, 160)
 	assert.NotEmpty(t, formatted)
 }
