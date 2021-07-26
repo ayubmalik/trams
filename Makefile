@@ -13,6 +13,7 @@ test: clean
 	go test ./...
 
 tag-release: changelog
+	@if [ "$(NEWTAG)" == "" ]; then echo Please set NEWTAG value first, e.g make tag-release NEWTAG=v0.1.x ; exit 1; fi
 	@git add CHANGELOG.md
 	@git commit -m  "Release $(NEWTAG) ($(TODAYDATE))"
 	@git tag $(NEWTAG)
