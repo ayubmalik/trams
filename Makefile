@@ -31,7 +31,9 @@ changelog: clean
 
 binaries: clean
 	@mkdir -p dist/linux dist/darwin dist/windows
+	GOOS=linux GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/linux/trams ./cmd/trams
 	GOOS=darwin GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/darwin/trams ./cmd/trams
+	GOOS=windows GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/windows/trams ./cmd/trams
 	
 clean:
 	@rm -rf $(TMPCHANGES)
