@@ -1,4 +1,4 @@
-BINARY=hello
+BINARY=trams
 LDFLAGS="-s -w -X main.version=${VERSION}"
 PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 PREVIOUSTAGDATE:=$(shell git log  -1 --format=%as $(PREVIOUSTAG))
