@@ -1,4 +1,4 @@
-name: trams-release
+name: Trams Build
 on: push
 jobs:
   test:
@@ -6,5 +6,5 @@ jobs:
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags')
     steps:
       - uses: actions/checkout@v2
-      - name: Run Unit Tests
-        run: make test
+      - name: Build
+        run: make build
