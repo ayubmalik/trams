@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.1 (2021-08-05)
+8b3396e build: fix binary name
+
+
 ## v1.0.0 (2021-08-05)
 1e5eec8 docs: update README.md
 a2b46d5 docs: added screencasts
