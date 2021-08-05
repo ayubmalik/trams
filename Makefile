@@ -4,7 +4,7 @@ PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 PREVIOUSTAGDATE:=$(shell git log  -1 --format=%as $(PREVIOUSTAG))
 TODAYDATE:=$(shell date +'%Y-%m-%d')
 TMPCHANGES=$(TMPDIR)/changes.tmp
-LDFLAGS="-s -w"
+LDFLAGS=-s -w
 
 build: test
 	go build -ldflags '$(LDFLAGS) -X "main.version=$(VERSION)"' ./cmd/trams/
