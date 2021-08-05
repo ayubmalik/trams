@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.0 (2021-08-05)
+1e5eec8 docs: update README.md
+a2b46d5 docs: added screencasts
+bbf933c fix: failing style test
+
+
 ## v0.1.6 (2021-07-26)
 baf1acb build: check for tag value
 ad6a902 build: build all binaries
