@@ -1,22 +1,22 @@
-VERSION=$(shell git describe --tags)
-LDFLAGS=-s -w
+BINARY=hello
+LDFLAGS="-s -w -X main.version=${VERSION}"
 PREVIOUSTAG:=$(shell git describe --tags --abbrev=0)
 PREVIOUSTAGDATE:=$(shell git log  -1 --format=%as $(PREVIOUSTAG))
+TMPCHANGES=/tmp/changes.tmp
 TODAYDATE:=$(shell date +'%Y-%m-%d')
-TMPCHANGES=$(TMPDIR)/changes.tmp
-LDFLAGS=-s -w
-
-build: test
-	go build -ldflags '$(LDFLAGS) -X "main.version=$(VERSION)"' ./cmd/trams/
+VERSION=$(shell git describe --tags --long)
 
 test: clean
 	go test ./...
 
-tag-release: changelog
-	@if [ "$(NEWTAG)" == "" ]; then echo Please set NEWTAG value first, e.g make tag-release NEWTAG=v0.1.x ; exit 1; fi
-	@git add CHANGELOG.md
-	@git commit -m  "Release $(NEWTAG) ($(TODAYDATE))"
-	@git tag $(NEWTAG)
+build: test
+	go build -ldflags $(LDFLAGS) -o $(BINARY) .
+
+binaries: test
+	@mkdir -p dist/linux dist/darwin dist/windows
+	GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/linux/$(BINARY) .
+	GOOS=darwin GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/darwin/$(BINARY) .
+	GOOS=windows GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/windows/$(BINARY).exe .
 
 changelog: clean
 	@echo Previous tag = $(PREVIOUSTAG)
@@ -24,18 +24,22 @@ changelog: clean
 	@echo "# Changelog" > $(TMPCHANGES)
 	@echo "" >> $(TMPCHANGES)
 	@echo "## $(NEWTAG) ($(TODAYDATE))" >> $(TMPCHANGES)
-	@git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" >> $(TMPCHANGES)
+	@git log $(PREVIOUSTAG)..HEAD --pretty=format:"%h %s" | grep -v 'build:' | grep -v 'Release v' >> $(TMPCHANGES)
 	@echo "" >> $(TMPCHANGES)
 	@touch CHANGELOG.md
 	@sed '/# Changelog/d' CHANGELOG.md >> $(TMPCHANGES)
 	@mv $(TMPCHANGES) CHANGELOG.md
 
-binaries: clean
-	@mkdir -p dist/linux dist/darwin dist/windows
-	GOOS=linux GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/linux/trams ./cmd/trams
-	GOOS=darwin GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/darwin/trams ./cmd/trams
-	GOOS=windows GOARCH=amd64 go build -ldflags=$(LDFLAGS) -o dist/windows/trams ./cmd/trams
-	
+release: changelog
+ifndef NEWTAG
+	$(error Please set NEWTAG value first, e.g make release NEWTAG=v0.1.)
+endif
+	@git add CHANGELOG.md
+	@git commit -m  "Release $(NEWTAG) ($(TODAYDATE))"
+	@git tag $(NEWTAG)
+	@git push
+	@git push --tags
+
 clean:
 	@rm -rf $(TMPCHANGES)
 	@rm -rf dist
