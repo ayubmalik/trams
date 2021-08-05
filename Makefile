@@ -14,9 +14,9 @@ build: test
 
 binaries: test
 	@mkdir -p dist/linux dist/darwin dist/windows
-	GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/linux/$(BINARY) .
-	GOOS=darwin GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/darwin/$(BINARY) .
-	GOOS=windows GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/windows/$(BINARY).exe .
+	GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/linux/$(BINARY) ./cmd/trams
+	GOOS=darwin GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/darwin/$(BINARY) ./cmd/trams
+	GOOS=windows GOARCH=amd64 go build -ldflags $(LDFLAGS) -o dist/windows/$(BINARY).exe ./cmd/trams
 
 changelog: clean
 	@echo Previous tag = $(PREVIOUSTAG)
