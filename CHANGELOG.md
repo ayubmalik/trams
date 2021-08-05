@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.2 (2021-08-05)
+0c951f8 docs: update README.md
+
+
 ## v1.0.1 (2021-08-05)
 8b3396e build: fix binary name
 
