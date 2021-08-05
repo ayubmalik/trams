@@ -1,0 +1,51 @@
+on:
+  push:
+    tags:
+      - 'v*'
+name: Trams Release
+jobs:
+  release:
+    name: Trams Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Binaries
+        id: binaries
+        run: make binaries
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          body_path: CHANGELOG.md
+      - name: Upload Linux
+        id: upload_linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: dist/linux/trams
+          asset_name: trams-linux-amd64
+          asset_content_type: application/x-binary
+      - name: Upload Macos
+        id: upload_macos
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: dist/darwin/trams
+          asset_name: trams-macos-amd64
+          asset_content_type: application/x-binary
+      - name: Upload Windows
+        id: upload_windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: dist/windows/trams.exe
+          asset_name: trams.exe-windows-amd64
+          asset_content_type: application/x-binary
