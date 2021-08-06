@@ -1,7 +1,6 @@
 # trams
 A command line application written in Go to display realtime departure information for Metrolink
 trams in the [Transport for Greater Manchester (TfGM)](https://tfgm.com/public-transport/tram) area in the UK.
-
 The information displayed is the same as displayed on the physical departure boards at each Metrolink station.
 
 The backend API providing the data is a GCP Cloud Function also written in Go.
