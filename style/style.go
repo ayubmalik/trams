@@ -139,7 +139,6 @@ func StationIDRows(stationIDs []string) []string {
 	count := len(stationIDs) - 1
 	rows := make([]string, 0)
 	row := ""
-	colourIndex := startColour
 	for i, s := range stationIDs {
 		var left, middle, right string
 		left = padRight(s)
@@ -151,30 +150,25 @@ func StationIDRows(stationIDs []string) []string {
 		}
 		row = lipgloss.JoinHorizontal(
 			lipgloss.Right,
-			colorizeStationID(left, colourIndex),
-			colorizeStationID(middle, colourIndex),
-			colorizeStationID(right, colourIndex),
+			colouriseStationID(left),
+			colouriseStationID(middle),
+			colouriseStationID(right),
 		)
 
 		if i%cols == 0 {
 			rows = append(rows, row)
 			row = ""
 		}
-
-		if i%(cols*6) == 0 {
-			colourIndex = nextColour(colourIndex)
-		}
 	}
 	return rows
 }
 
-func colorizeStationID(stationID string, colorIndex int) string {
+func colouriseStationID(stationID string) string {
 	if stationID == "" {
 		return stationID
 	}
 
-	n := strconv.Itoa(colorIndex)
-	return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(n)).Render(stationID)
+	return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#ffd636")).Render(stationID)
 }
 
 func padRight(s string) string {

@@ -67,7 +67,7 @@ func displayMetrolinks(refs []string) error {
 	}
 	ids := lookupIDs(groupedStationIDs, refs)
 
-	client := trams.NewClient(apiURL, 1000)
+	client := trams.NewClient(apiURL, 2000)
 	metrolinks, err := client.Get(ids...)
 	if err != nil {
 		return err
