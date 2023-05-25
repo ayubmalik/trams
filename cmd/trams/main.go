@@ -28,7 +28,7 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:      "display",
-				Usage:     "display tram information for specified Metrolink stations. If no stations are specified displays all stations. Run `trams help display` for more details.",
+				Usage:     "display tram information for specified Metrolink stations. e.g trams display ABM. If no stations are specified displays all stations. Run `trams help display` for more details.",
 				UsageText: "display [STATION...] - If no STATION arguments are specified, displays all stations. Multiple STATION arguments can be specified as short name e.g. `display BCH MAN VIC`",
 				Action: func(c *cli.Context) error {
 					err := displayMetrolinks(c.Args().Slice())
