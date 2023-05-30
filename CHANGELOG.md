@@ -1,6 +1,26 @@
 # Changelog
 
 ## 1.0.3 (2023-05-30)
+d15f32f Update Changlelog
+e8f217d Remove colours from station list
+d9a9334 Update dependencies and min go version
+7034057 Update README.md
+6716893 Update README.md
+88d652c docs: update image
+b074516 docs: update image
+
+
+##  (2023-05-30)
+d15f32f Update Changlelog
+e8f217d Remove colours from station list
+d9a9334 Update dependencies and min go version
+7034057 Update README.md
+6716893 Update README.md
+88d652c docs: update image
+b074516 docs: update image
+
+
+## 1.0.3 (2023-05-30)
 e8f217d Remove colours from station list
 d9a9334 Update dependencies and min go version
 7034057 Update README.md
