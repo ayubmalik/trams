@@ -8,7 +8,7 @@ jobs:
     name: Trams Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Binaries
         id: binaries
         run: make binaries
