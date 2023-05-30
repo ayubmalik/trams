@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.4 (2023-05-30)
+320da73 feat: delete cache of stations if stale
+
+
 ## 1.0.3 (2023-05-30)
 d15f32f Update Changlelog
 e8f217d Remove colours from station list
