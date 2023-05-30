@@ -8,6 +8,7 @@ import (
 	"path"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/ayubmalik/trams"
 	"github.com/ayubmalik/trams/style"
@@ -15,7 +16,8 @@ import (
 )
 
 const (
-	apiURL = "https://europe-west2-tramsfunc.cloudfunctions.net/tramsfunc"
+	apiURL      = "https://europe-west2-tramsfunc.cloudfunctions.net/tramsfunc"
+	maxCacheAge = 7 * 24 * time.Hour
 )
 
 var version = "dev"
@@ -134,11 +136,14 @@ func getAllStationsGroupedByRef() (map[string][]trams.StationID, error) {
 	return groupedStationIDs, nil
 }
 
+// TODO tidy up this func and error handling
 func cachedStations(client trams.Client, cache string) (map[string][]trams.StationID, error) {
 	var stationIDs []trams.StationID
 	var groupedStationIDs map[string][]trams.StationID
+	var info os.FileInfo
 
-	if _, err := os.Stat(cache); os.IsNotExist(err) {
+	info, err := os.Stat(cache)
+	if os.IsNotExist(err) || isStaleFile(info) {
 		stationIDs, err = client.List()
 		if err != nil {
 			return nil, err
@@ -150,6 +155,8 @@ func cachedStations(client trams.Client, cache string) (map[string][]trams.Stati
 		}
 		defer f.Close()
 		json.NewEncoder(f).Encode(stationIDs)
+	} else if err != nil {
+		return nil, err
 	}
 
 	f, err := os.Open(cache)
@@ -161,6 +168,10 @@ func cachedStations(client trams.Client, cache string) (map[string][]trams.Stati
 
 	groupedStationIDs = groupStationIDsByRef(stationIDs)
 	return groupedStationIDs, nil
+}
+
+func isStaleFile(info os.FileInfo) bool {
+	return info != nil && time.Now().Sub(info.ModTime()) > maxCacheAge
 }
 
 func groupStationIDsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {

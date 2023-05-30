@@ -6,11 +6,10 @@ TMPCHANGES=/tmp/changes.tmp
 TODAYDATE:=$(shell date +'%Y-%m-%d')
 VERSION=$(shell git describe --tags --long)
 
+build: binaries
+
 test: clean
 	go test ./...
-
-build: test
-	go build -ldflags $(LDFLAGS) -o $(BINARY) .
 
 binaries: test
 	@mkdir -p dist/linux dist/darwin dist/windows
