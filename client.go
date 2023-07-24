@@ -2,7 +2,11 @@ package trams
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
+	"net/http/httputil"
+	"os"
 	"strings"
 	"time"
 )
@@ -33,6 +37,17 @@ func (c Client) Get(ids ...string) ([]Metrolink, error) {
 		return nil, err
 	}
 
+	dump, err := httputil.DumpResponse(resp, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if os.Getenv("TRAMS_DEBUG") == "1" {
+		fmt.Println("--- Start Response Body (Get)")
+		fmt.Printf("%q\n", dump)
+		fmt.Println("--- End Response Body (Get)")
+	}
+
 	var metrolinks []Metrolink
 	err = json.NewDecoder(resp.Body).Decode(&metrolinks)
 	if err != nil {
@@ -47,6 +62,17 @@ func (c Client) List() ([]StationID, error) {
 	resp, err := http.Get(c.url)
 	if err != nil {
 		return nil, err
+	}
+
+	dump, err := httputil.DumpResponse(resp, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if os.Getenv("TRAMS_DEBUG") == "1" {
+		fmt.Println("--- Start Response Body (List)")
+		fmt.Printf("%q\n", dump)
+		fmt.Println("--- End Response Body (List)")
 	}
 
 	var stationIDs []StationID
