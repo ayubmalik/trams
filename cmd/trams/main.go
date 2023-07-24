@@ -1,14 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"path"
 	"sort"
 	"strconv"
-	"time"
 
 	"github.com/ayubmalik/trams"
 	"github.com/ayubmalik/trams/style"
@@ -16,8 +14,7 @@ import (
 )
 
 const (
-	apiURL      = "https://europe-west2-tramsfunc.cloudfunctions.net/tramsfunc"
-	maxCacheAge = 7 * 24 * time.Hour
+	apiURL = "https://europe-west2-tramsfunc.cloudfunctions.net/tramsfunc"
 )
 
 var version = "dev"
@@ -25,13 +22,13 @@ var version = "dev"
 func main() {
 
 	app := &cli.App{
-		Usage:     "display Metrolink tram information using data from TfGM API",
+		Usage:     "Metrolink tram information using data from TfGM API. Use the appropriate sub command (see below) e.g. 'trams list' or 'trams display'",
 		UsageText: "trams COMMAND [args]",
 		Commands: []*cli.Command{
 			{
 				Name:      "display",
-				Usage:     "display tram information for specified Metrolink stations. e.g trams display ABM. If no stations are specified displays all stations. Run `trams help display` for more details.",
-				UsageText: "display [STATION...] - If no STATION arguments are specified, displays all stations. Multiple STATION arguments can be specified as short name e.g. `display BCH MAN VIC`",
+				Usage:     "display tram information for specified Metrolink stations. e.g. 'trams display ABM'. Multiple stations are separated by a space. If no stations are specified displays all stations. Run 'trams help display' for more details.",
+				UsageText: "display [STATION...] - If no STATION arguments are specified, displays all stations. Multiple STATION arguments can be specified as short name e.g. 'trams display BCH MAN VIC'",
 				Action: func(c *cli.Context) error {
 					err := displayMetrolinks(c.Args().Slice())
 					return err
@@ -39,7 +36,7 @@ func main() {
 			},
 			{
 				Name:  "list",
-				Usage: "list all stations with short name (TLAREF) and name so can be used by 'display' command.",
+				Usage: "list all stations with short reference and name. The short reference is supplied to the 'display' command.",
 				Action: func(c *cli.Context) error {
 					err := listStations()
 					return err
@@ -124,54 +121,13 @@ func getCacheFile() (string, error) {
 
 func getAllStationsGroupedByRef() (map[string][]trams.StationID, error) {
 	client := trams.NewClient(apiURL, 1000)
-	cache, err := getCacheFile()
+	stationIDs, err := client.List()
 	if err != nil {
 		return nil, err
 	}
 
-	groupedStationIDs, err := cachedStations(client, cache)
-	if err != nil {
-		return nil, err
-	}
+	groupedStationIDs := groupStationIDsByRef(stationIDs)
 	return groupedStationIDs, nil
-}
-
-// TODO tidy up this func and error handling
-func cachedStations(client trams.Client, cache string) (map[string][]trams.StationID, error) {
-	var stationIDs []trams.StationID
-	var groupedStationIDs map[string][]trams.StationID
-	var info os.FileInfo
-
-	info, err := os.Stat(cache)
-	if os.IsNotExist(err) || isStaleFile(info) {
-		stationIDs, err = client.List()
-		if err != nil {
-			return nil, err
-		}
-
-		f, err := os.Create(cache)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		json.NewEncoder(f).Encode(stationIDs)
-	} else if err != nil {
-		return nil, err
-	}
-
-	f, err := os.Open(cache)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	json.NewDecoder(f).Decode(&stationIDs)
-
-	groupedStationIDs = groupStationIDsByRef(stationIDs)
-	return groupedStationIDs, nil
-}
-
-func isStaleFile(info os.FileInfo) bool {
-	return info != nil && time.Now().Sub(info.ModTime()) > maxCacheAge
 }
 
 func groupStationIDsByRef(stationIDS []trams.StationID) map[string][]trams.StationID {
