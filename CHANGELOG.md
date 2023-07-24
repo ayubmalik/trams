@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0 (2023-07-24)
+6047e90 feat: add debug
+
+
 ## v1.1.0 (2023-07-24)
 a72e9e6 Removed caching file as probably overkill.
 
