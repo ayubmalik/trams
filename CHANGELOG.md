@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0 (2023-07-24)
+a72e9e6 Removed caching file as probably overkill.
+
+
 ## v1.0.4 (2023-05-30)
 320da73 feat: delete cache of stations if stale
 
